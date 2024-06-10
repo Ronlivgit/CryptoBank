@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     phoneNum : {type : Number , require : true} ,
     walletId : {type : String},
     role : {type : String , enum : roleOptions , default : "user", require : false },
-    defaultAccount : {type : Object , default : ""}
+    activeAccount : {type : Object , default : ""}
 })
 
 
