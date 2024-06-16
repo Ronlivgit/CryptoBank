@@ -4,7 +4,7 @@ const { Wallet } = require("../models/wallet.model");
 const { Tx } = require("../models/txs.model");
 const { User } = require("../models/user.model");
 const { config } = require("../config/config");
-const { completeSignedTx , decryptAccountInfo , readTxByTxHash , dollarToEth , serializeBigInt} = require("../middleware/walletFunctions");
+const { completeSignedTx , decryptAccountInfo , readTxByTxHash , dollarToEth , serializeBigInt , serializeObject} = require("../middleware/walletFunctions");
 const { operatorAbi } = require("../smartContracts/BILS");
 
 const web3Provider = new Web3.providers.HttpProvider("https://sepolia.infura.io/v3/14bf7a4ba6194ff3b1f6b419426fcda2");
@@ -16,7 +16,8 @@ const myContract = new web3.eth.Contract(operatorAbi,"0xb38051727B955bEf69D8F018
 const myCA = "0xb38051727B955bEf69D8F0185EC2D9CA3F944e61"
 
 //! admin only!! can get every address's eligibility
-const globalGetEligibility = async(walletAddress) => {
+const globalGetEligibility = async(req,res) => {
+    const walletAddress = req.query.walletAddress
     try {
         const result = await myContract.methods.eligibilityOf(walletAddress).call({from : devAddress})
         return serializeBigInt(result)
@@ -46,7 +47,7 @@ const transferEligibility = async(req,res) => {
         const gasPrice = await web3.eth.getGasPrice()
         const data = myContract.methods.transferEligibility(_from,toAddress,_amount).encodeABI()
         const tx = {
-            from : _from,
+            from : devAddress,
             to : myCA,
             amount : _amount,
             gas : estimateGas,
@@ -55,8 +56,17 @@ const transferEligibility = async(req,res) => {
         }
         const signedTx = await myAccount.signTransaction(tx)
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        const tempPayload = serializeObject(receipt)
+        const finalPayload = {
+            from : tempPayload.from,
+            to : tempPayload.to,
+            blockNumber : tempPayload.blockNumber,
+            transactionHash : tempPayload.transactionHash,
+        }
+        const newTx = new Tx({txHash : receipt.transactionHash , walletId : req.user.walletId , txType : "transfer" , txPayload : tx})
+        await newTx.save()
         const newBalance = await myContract.methods.eligibilityOf(userAccount.accounts[0].data.address).call({ from: myAccount.address });
-        return res.status(200).send({message : `Transfered ${_amount} successfully` , "Current eligibility : " : serializeBigInt(newBalance)})
+        return res.status(200).send({finalPayload})
     } catch (error) {
         console.error(error);
     }
@@ -90,6 +100,8 @@ const increaseEligibility = async(req,res) => {
         }
         const signedTx = await myAccount.signTransaction(tx)
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        const newTx = new Tx({txHash : receipt.transactionHash , walletId : req.user.walletId , txType : "deposit" , txPayload : tx})
+        await newTx.save()
         const newBalance = await globalGetEligibility(_to)
         return res.status(200).send({Msg :`Previous Balance : ${oldBalance} , New Balance : ${newBalance}`})
     } catch (error) {
