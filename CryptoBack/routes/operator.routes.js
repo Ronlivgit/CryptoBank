@@ -3,18 +3,25 @@ const router = Router();
 const {
   addAccountToWallet,
   getAccountWallet,
-} = require("../controllers/account.controller");
+} = require("../controllers/bns.controller");
 const { Authentication } = require("../middleware/authentication");
-const { getEligibility , transferEligibility, increaseEligibility , globalGetEligibility } = require("../controllers/operator.controller");
+const {
+  getCurrentBalance,
+  transferBalance,
+  changeBalance,
+  globalCurrentBalance,
+  balanceHistory,
+} = require("../controllers/operator.controller");
 
+router.get("/", Authentication, getCurrentBalance);
 
-router.get('/' , Authentication , getEligibility)
+router.get("/balanceOf/:walletAddress", globalCurrentBalance);
 
-router.post('/transfer' , Authentication , transferEligibility)
+router.get('/history' , Authentication , balanceHistory)
 
-router.post('/increase', Authentication , increaseEligibility)
+router.post("/transfer", Authentication, transferBalance);
 
-router.get('/?=walletAddress' , globalGetEligibility)
+router.post("/increase", Authentication, changeBalance);
 
 
 module.exports = router;

@@ -5,14 +5,13 @@ const { Tx } = require("../models/txs.model");
 const { User } = require("../models/user.model");
 const { config } = require("../config/config");
 const { completeSignedTx , decryptAccountInfo , readTxByTxHash , dollarToEth , serializeBigInt , serializeObject} = require("../middleware/walletFunctions");
-const { creditCardAbi } = require("../smartContracts/BILS");
+const { creditCardAbi } = require("../smartContracts/ABIs");
 const axios = require('axios');
 const { Authentication } = require("../middleware/authentication");
 const { transferEligibility } = require("./operator.controller");
 
 
-const web3Provider = new Web3.providers.HttpProvider("https://sepolia.infura.io/v3/14bf7a4ba6194ff3b1f6b419426fcda2");
-const web3 = new Web3(web3Provider);
+const web3 = new Web3(new Web3.providers.HttpProvider(config.webProvider));
 
 const myAccount = web3.eth.accounts.privateKeyToAccount(config.devPk)
 const devAddress = '0x5322f9A185d91480ED04eE09F10f0fE4aA6efC14'

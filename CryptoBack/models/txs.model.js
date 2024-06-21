@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 
-const enumArr = ["transfer","deposit","withdraw","payment"]
+const enumArr = ["transfer","deposit","withdraw","payment","subscription"]
 
 const txSchema = new mongoose.Schema({
     txHash : {type : String , required : true},

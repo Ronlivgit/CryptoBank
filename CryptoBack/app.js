@@ -5,7 +5,7 @@ const app = express();
 
 //! Routers area
 const userRouter = require("./routes/user.routes");
-const accountRouter = require("./routes/account.routes");
+const bnsRouter = require("./routes/bns.routes");
 const operatorRouter = require('./routes/operator.routes')
 const creditCardRouter = require('./routes/creditCard.routes')
 
@@ -14,7 +14,7 @@ app.use(cors());
 
 //! app.use() api with route
 app.use("/api/user", userRouter);
-app.use("/api/account", accountRouter);
+app.use("/api/bns", bnsRouter);
 app.use("/api/operator", operatorRouter);
 app.use("/api/card", creditCardRouter);
 
