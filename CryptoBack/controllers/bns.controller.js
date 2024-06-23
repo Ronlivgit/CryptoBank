@@ -11,8 +11,8 @@ const web3 = new Web3(new Web3.providers.HttpProvider(config.webProvider));
 const devAddress = '0x5322f9A185d91480ED04eE09F10f0fE4aA6efC14'
 const devAccount = web3.eth.accounts.privateKeyToAccount(config.devPk)
 
-const bnsContract = new web3.eth.Contract(bnsAbi,"0xa1323D4ea90e363B46Eb36e9AaCCf9753b905EF0")
-const bnsCA = "0xa1323D4ea90e363B46Eb36e9AaCCf9753b905EF0"
+const bnsContract = new web3.eth.Contract(bnsAbi,"0xc9E3c3324B8DA10Ce5C272964DD7B325d9930e6F")
+const bnsCA = "0xc9E3c3324B8DA10Ce5C272964DD7B325d9930e6F"
 
 const registerBns = async (req,res) => {
     const { bnsName } = req.body

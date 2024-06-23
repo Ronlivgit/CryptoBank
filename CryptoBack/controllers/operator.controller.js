@@ -11,8 +11,8 @@ const web3 = new Web3(new Web3.providers.HttpProvider(config.webProvider));
 
 const myAccount = web3.eth.accounts.privateKeyToAccount(config.devPk)
 const devAddress = '0x5322f9A185d91480ED04eE09F10f0fE4aA6efC14'
-const myContract = new web3.eth.Contract(balanceAbi,"0xd4e04A02705ea51aD9f48E1Ac1c0EDA23280530b")
-const myCA = "0xd4e04A02705ea51aD9f48E1Ac1c0EDA23280530b"
+const myContract = new web3.eth.Contract(balanceAbi,"0x541481976Dd87ECCd6B4914aCbaAd8298E7C13b2")
+const myCA = "0x541481976Dd87ECCd6B4914aCbaAd8298E7C13b2"
 
 //! admin only!! can get every address's eligibility
 const globalCurrentBalance = async(req,res) => {
@@ -102,11 +102,13 @@ const changeBalance = async(req,res) => {
 const balanceHistory = async(req,res) => {
     try {
         let userAccount = await Wallet.findById(req.user.walletId)
-        const result = await myContract.methods.currentBalance(userAccount.accounts[0].data.address).call({ from: myAccount.address });
-        console.log("history's result : " , result);
-        return res.status(200).send({message : "Got Eligibility successfully , " , history : result})
+        const result = await myContract.methods.userHistory(userAccount.accounts[0].data.address).call({ from: myAccount.address });
+        const userHistory = result.map((item)=>{
+            return serializeObject(item)
+        })
+        return res.status(200).send({message : "Got Eligibility successfully , " , history : userHistory})
     } catch (error) {
-        
+        console.error(error);
     }
 }
 

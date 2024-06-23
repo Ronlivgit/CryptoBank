@@ -1,46 +1,44 @@
 import React, { useEffect, useState } from "react";
 import "./Home.css";
+import { useSelector } from "react-redux";
+import Transactions from "../../components/Transactions";
 
 export default function HomePage() {
 
-  const [isLogin,setIsLogin] = useState(false)
+  const user = useSelector((state)=> state.user)
+  useEffect(()=>{
+    console.log("useEffect user : " , user);
+  },[user])
 
   return (
-    <>
-      <div className="flex flex-wrap justify-center h-full w-full absolute top-0 bg-local" >
-        <div className="flex-wrap relative h-6/6 w-full mt-14">
-          <div className="h-full w-6/12 absolute right-0 bg-red-500">
-            <div>
-            {isLogin ? 
-              <img src='src\assets\Login.png' className="h-full w-screen absolute right-0" />
-            :
-              <img src='src\assets\Register.png' className="h-full w-screen absolute right-0"/>
-            }
-            </div>
-          </div>
-          <div className="h-full w-6/12 absolute left-0 bg-purple-300" >
-            <div className="join join-vertical w-3/5 h-3/5 display flex flex-wrap justify-evenly absolute right-1/4 top-1/4 p-16" style={{backgroundImage:"url('src/assets/AuthenticationBG.png')"}}>  
-              <label className="input input-bordered flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" /></svg>
-                <input type="text" className="grow" placeholder="Username" />
-              </label>
-              <label className="input input-bordered flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70"><path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" /><path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" /></svg>
-                <input type="text" className="grow" placeholder="Email" />
-              </label>
-              <label className="input input-bordered flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70"><path fillRule="evenodd" d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z" clipRule="evenodd" /></svg>
-                <input type="password" className="grow" value="password" />
-              </label>
-              {/* <label className="input input-bordered flex items-center gap-2">
-                <input type="text" className="grow" placeholder="Full Name" />
-              </label> */}
-              <button className="btn glass bg-purple-400 rounded-3xl">Neutral</button>
-            </div>
-          </div>
+    <div className="bg-red-500 h-[96vh] -mt-[8px] flex">
+      {/* Black Background : left Side */}
+      <div className="bg-black w-[70vw] h-full ">
+      {/* Balance + Graphs */}
+        <div className="bg-sky-300 h-[43%] mt-[0.5%]">
+          <h1>Welcome and etc, graphs, balance , ++</h1>
+        </div>
+        {/* Transactions History*/}
+        <div className="bg-amber-500 h-[56.3%] flex flex-col justify-evenly">
+        {/* Create a Card or something to show the TXS based on the data, make every address a BNS */}
+          <Transactions />
         </div>
       </div>
-    </>
+      {/* Green BackGround : Right Side */}
+      <div className="bg-green-500 w-[30vw] h-full ">
+        {/* Credit Card, Quick Actions */}
+      </div>
+
+    </div>
   );
 }
 
+//BACKUP : 
+
+      // <div className="bg-blue-400 w-[27vw] h-full">
+      //   {/* Graphs and Friend List?. */}
+      // </div>
+
+      // <div className="bg-black w-[46vw] h-full ">
+      //   {/* Transactions History + Balance + Graphs  */}
+      // </div>

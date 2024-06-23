@@ -42,8 +42,10 @@ const logUser = async (req,res) => {
         if(checkUser){
             const checkPassword = await bcrypt.compare(password,checkUser.password);
             if(checkPassword){
-              const token = generateToken({userId:checkUser.userId , email : checkUser.email , role : checkUser.role , walletId : checkUser.walletId })
-              return res.status(200).send({message : "Logged in successfully" , user : checkUser , token})
+              const token = generateToken(
+                {email : checkUser.email , role : checkUser.role ,
+                walletId : checkUser.walletId,activeAddress : checkUser.activeAccount.address })
+              return res.status(200).send({user : checkUser , token})
             }
             return res.status(401).json("User not found or invalid credentials");
         }
