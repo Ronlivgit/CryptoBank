@@ -1,11 +1,15 @@
 const { Router } = require("express");
 const router = Router();
-const { registerBns , userByBns, removeBns } = require("../controllers/bns.controller");
+const { registerBns , userByBns, removeBns , bnsByAddress, checkIfExist } = require("../controllers/bns.controller");
 const { Authentication } = require("../middleware/authentication");
 
-router.get("/:bnsName", Authentication, userByBns);
+router.get("/byBns/:bnsName", Authentication, userByBns);
 
-router.post("/newBNS", Authentication, registerBns);
+router.get("/byAddress/:address", Authentication, bnsByAddress);
+
+router.post('/checkBns' , Authentication , checkIfExist);
+
+router.post("/createBNS", Authentication, registerBns);
 
 router.delete('/deleteBNS/:bnsName' , Authentication , removeBns)
 

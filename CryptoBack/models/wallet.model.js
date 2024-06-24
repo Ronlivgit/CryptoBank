@@ -5,6 +5,7 @@ const walletSchema = new mongoose.Schema({
     ownerUserId : {type : String, } ,
     walletId : {type : String},
     accounts : {type : Array},
+    bnsName : {type : String, default : ''},
 })
 
 

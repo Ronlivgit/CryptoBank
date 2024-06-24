@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { baseUserAPI , postData } from '../../config/Api';
+import { baseUserUrl , postData } from '../../config/Api';
 import { useSelector , useDispatch } from 'react-redux';
 import { setUser } from '../../redux/reducers';
 
@@ -29,7 +29,7 @@ const AuthForm = () => {
     else{
       // Login POST
       console.log("newUser : " , newUser);
-      const res = await fetch(`${baseUserAPI}/login`,{
+      const res = await fetch(`${baseUserUrl}/login`,{
         method : "POST",
         body : JSON.stringify(newUser),
         headers : {

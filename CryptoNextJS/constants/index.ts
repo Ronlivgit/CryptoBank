@@ -1,3 +1,5 @@
+import { z } from "zod"
+
 export const sidebarLinks = [
   {
     imgURL: "/icons/home.svg",
@@ -141,3 +143,28 @@ export const transactionCategoryStyles = {
     chipBackgroundColor: "bg-inherit",
   },
 };
+
+
+export const signUpSchema = z.object({
+  firstName: z.string().min(2, {
+    message: "First name must be at least 2 characters.",
+  }),
+  lastName: z.string().min(2, {
+    message: "Last name must be at least 2 characters.",
+  }),
+  email: z.string().min(4, {
+    message: "Email must be at least 4 characters",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters",
+  }),
+});
+
+export const signInSchema = z.object({
+  email: z.string().min(4, {
+    message: "Email must be at least 4 characters",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters",
+  }),
+});

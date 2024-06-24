@@ -63,8 +63,6 @@ const transferBalance = async(req,res) => {
             blockNumber : tempPayload.blockNumber,
             transactionHash : tempPayload.transactionHash,
         }
-        const newTx = new Tx({txHash : receipt.transactionHash , walletId : req.user.walletId , txType : "transfer" , txPayload : tx})
-        await newTx.save()
         const newBalance = await myContract.methods.currentBalance(userAccount.accounts[0].data.address).call({ from: myAccount.address });
         return res.status(200).send({finalPayload})
     } catch (error) {
@@ -90,8 +88,6 @@ const changeBalance = async(req,res) => {
         }
         const signedTx = await myAccount.signTransaction(tx)
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-        const newTx = new Tx({txHash : receipt.transactionHash , walletId : req.user.walletId , txType : "deposit" , txPayload : tx})
-        await newTx.save()
         const newBalance = await myContract.methods.currentBalance(_to).call({ from: myAccount.address });
         return res.status(200).send({Msg :`Previous Balance : ${oldBalance} , New Balance : ${newBalance}`})
     } catch (error) {
