@@ -31,7 +31,7 @@ const getCurrentBalance = async (req,res) => {
     try {
         let userAccount = await Wallet.findById(req.user.walletId)
         const result = await myContract.methods.currentBalance(`0x${userAccount.accounts[0].data.address}`).call({ from: myAccount.address });
-        return res.status(200).send({message : "Got Eligibility successfully , " , eligibility : serializeBigInt(result)})
+        return res.status(200).send({message : "Got Balance successfully , " , balance : serializeBigInt(result)})
     } catch (error) {
         console.error(error);
     }
@@ -39,17 +39,17 @@ const getCurrentBalance = async (req,res) => {
 
 //! will be used to transfer funds from X to Y , can be used by both admin and user
 const transferBalance = async(req,res) => {
-    const {toAddress , _amount} = req.body
+    const {toAddress , amount} = req.body
     try {
         let userAccount = await Wallet.findById(req.user.walletId)
         let _from = `0x${userAccount.accounts[0].data.address}`
-        const estimateGas = await myContract.methods.transferBalance(_from,toAddress,_amount).estimateGas({from : devAddress})
+        const estimateGas = await myContract.methods.transferBalance(_from,toAddress,amount).estimateGas({from : devAddress})
         const gasPrice = await web3.eth.getGasPrice()
-        const data = myContract.methods.transferBalance(_from,toAddress,_amount).encodeABI()
+        const data = myContract.methods.transferBalance(_from,toAddress,amount).encodeABI()
         const tx = {
             from : devAddress,
             to : myCA,
-            amount : _amount,
+            amount : amount,
             gas : estimateGas,
             gasPrice : gasPrice,
             data : data
@@ -58,30 +58,31 @@ const transferBalance = async(req,res) => {
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         const tempPayload = serializeObject(receipt)
         const finalPayload = {
-            from : tempPayload.from,
-            to : tempPayload.to,
+            from : _from,
+            to : toAddress,
             blockNumber : tempPayload.blockNumber,
             transactionHash : tempPayload.transactionHash,
         }
         const newBalance = await myContract.methods.currentBalance(userAccount.accounts[0].data.address).call({ from: myAccount.address });
         return res.status(200).send({finalPayload})
     } catch (error) {
+        return res.status(401).send({Error : error.cause.message})
         console.error(error);
     }
 }
 
 //! admin only. will be used to deposit funds into account (Deposit eligibility)
 const changeBalance = async(req,res) => {
-    const {_to , _amount} = req.body
+    const {_to , amount} = req.body
     try {
         const oldBalance = await myContract.methods.currentBalance(_to).call({ from: myAccount.address });
-        const estimateGas = await myContract.methods.changeBalance(_to , _amount).estimateGas({from : devAddress})
+        const estimateGas = await myContract.methods.changeBalance(_to , amount).estimateGas({from : devAddress})
         const gasPrice = await web3.eth.getGasPrice()
-        const data = myContract.methods.changeBalance(_to , _amount).encodeABI()
+        const data = myContract.methods.changeBalance(_to , amount).encodeABI()
         const tx = {
             from : devAddress,
             to : myCA,
-            amount : _amount,
+            amount : amount,
             gas : estimateGas,
             gasPrice : gasPrice,
             data : data
@@ -89,7 +90,7 @@ const changeBalance = async(req,res) => {
         const signedTx = await myAccount.signTransaction(tx)
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         const newBalance = await myContract.methods.currentBalance(_to).call({ from: myAccount.address });
-        return res.status(200).send({Msg :`Previous Balance : ${oldBalance} , New Balance : ${newBalance}`})
+        return res.status(200).send({Msg :`${_to} Previous Balance : ${oldBalance} , New Balance : ${newBalance}`})
     } catch (error) {
         console.error(error);
     }

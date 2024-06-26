@@ -58,7 +58,6 @@ const bnsByAddress = async (req,res) => {
         const userData = await bnsContract.methods.getUserByAddress(address).call({from : devAddress})
         return res.status(200).send({Message : "Got user details by bnsName : " , data : userData})
     } catch (error) {
-        console.error(error);
         return res.status(404).send({Message : `${address} has no BNS attached to it`})
     }
 }

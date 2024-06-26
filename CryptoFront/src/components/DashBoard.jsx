@@ -1,94 +1,129 @@
-/* eslint-disable no-unused-vars */
-import React from 'react'
+/* eslint-disable react/prop-types */
+import { useRef } from 'react';
+import { Chart as ChartJS, TimeScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import { Line, Pie } from 'react-chartjs-2';
+import 'chartjs-adapter-date-fns';
 
-const BankDashboard = () => {
+ChartJS.register(TimeScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
+
+const BankDashBoard = ({ transactions, currentBalance }) => {
+  const lineChartRef = useRef(null);
+  const pieChartRef = useRef(null);
+
+  const { labels, balances, operations } = transactions.reduce((acc, transaction) => {
+    const date = new Date(parseInt(transaction.timestamp) * 1000);
+    const amount = parseInt(transaction.amount);
+    acc.labels.push(date);
+    acc.runningBalance += amount;
+    acc.balances.push(acc.runningBalance);
+
+    // Categorize transactions for pie chart
+    if (transaction.operationType === "changeBalance") {
+      amount > 0 ? acc.operations.deposit += amount : acc.operations.withdraw -= amount;
+    } else if (transaction.operationType === "transferBalance") {
+      amount > 0 ? acc.operations.received += amount : acc.operations.sent -= amount;
+    }
+
+    return acc;
+  }, { 
+    labels: [], 
+    balances: [], 
+    runningBalance: 0, 
+    operations: { deposit: 0, withdraw: 0, received: 0, sent: 0 }
+  });
+
+  const lineData = {
+    labels,
+    datasets: [{
+      label: 'Balance',
+      data: balances,
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1
+    }]
+  };
+
+  const pieData = {
+    labels: ['Deposit', 'Withdraw', 'Received', 'Sent'],
+    datasets: [{
+      data: [operations.deposit, operations.withdraw, operations.received, operations.sent],
+      backgroundColor: [
+        'rgba(75, 192, 192, 0.8)', // Deposit - green
+        'rgba(255, 99, 132, 0.8)', // Withdraw - red
+        'rgba(54, 162, 235, 0.8)', // Received - blue
+        'rgba(255, 206, 86, 0.8)'  // Sent - orange
+      ]
+    }]
+  };
+
+  const pieOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      title: {
+        display: true,
+        text: 'Financial Operations Breakdown'
+      }
+    }
+  };
+
+  const lineOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        type: 'time',
+        time: {
+          unit: 'day', // Adjust this based on your data
+          displayFormats: {
+            day: `d.MM`
+          }
+        },
+        title: {
+          display: false,
+          text: 'Date'
+        },
+        ticks: {
+          autoSkip: true,
+          maxTicksLimit: 10,
+          source: 'auto'
+        },
+        min: labels.length > 0 ? labels[0] : undefined,
+        max: labels.length > 0 ? labels[labels.length - 1] : undefined,
+      },
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Balance'
+        }
+      }
+    }
+  };
+
+
+
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 p-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-yellow-400 rounded-full"></div>
-              <span className="font-bold text-xl">LINES BANK</span>
-            </div>
-            <nav className="hidden md:flex space-x-4">
-              <a href="#" className="text-gray-600 hover:text-gray-900">Home</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">Transactions</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">Payments</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">Deposits</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">Credits</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">Archive</a>
-            </nav>
-            <div className="flex items-center space-x-2">
-              <span>Jack Davidson</span>
-              <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-            </div>
+    <div className="container h-full mx-auto px-4 py-8 text-white">
+      <h1 className="text-xl md:text-4xl font-bold mb-8">Welcome back User B Demo</h1>
+      <div className="mb-8">
+        <h2 className="text-xl md:text-2xl font-bold">Current Balance : ${currentBalance}</h2>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-8 lg:ml-[15%]">
+        {/* Line Chart */}
+        <div className="lg:col-span-4 bg-white/90 p-4 rounded-lg shadow-lg ">
+          <div className="h-40 md:h-64">
+            <Line ref={lineChartRef} data={lineData} options={lineOptions} />
           </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="flex">
-          {/* Friends List (Left Sidebar) */}
-          <div className="w-1/4 p-4 border-r border-gray-200">
-            <h2 className="font-bold text-lg mb-4">Friends</h2>
-            <ul className="space-y-2">
-              <li className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-500 rounded-full"></div>
-                <span>John Doe</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-green-500 rounded-full"></div>
-                <span>Jane Smith</span>
-              </li>
-              {/* Add more friends as needed */}
-            </ul>
+        </div>
+        {/* Combined Pie Chart */}
+        <div className="bg-white/90 p-4 rounded-lg shadow-lg block col-span-2">
+          <div className="h-64">
+            <Pie ref={pieChartRef} data={pieData} options={pieOptions} />
           </div>
-
-          {/* Balance and Main Content (Center) */}
-          <div className="w-1/2 p-4">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold">Current Balance</h2>
-              <p className="text-4xl font-bold text-green-600">$15,092.45</p>
-            </div>
-
-            {/* Additional content can be added here */}
-            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-6 rounded-xl mb-6">
-              <h3 className="text-xl font-bold mb-2">Debit card under new terms and conditions</h3>
-              <ul className="space-y-1">
-                <li>Fast calculation</li>
-                <li>Payments in 1 day</li>
-                <li>24-hour support</li>
-              </ul>
-              <button className="mt-4 bg-white text-indigo-600 px-4 py-2 rounded-full font-bold">See more</button>
-            </div>
-
-            {/* Transactions Chart (placeholder) */}
-            <div className="bg-white p-4 rounded-xl shadow">
-              <h3 className="font-bold mb-2">Transactions in January</h3>
-              <div className="h-40 bg-gray-200 rounded-lg"></div> {/* Placeholder for chart */}
-            </div>
-          </div>
-
-          {/* Quick Actions (Right Sidebar) */}
-          <div className="w-1/4 p-4 border-l border-gray-200">
-            <h2 className="font-bold text-lg mb-4">Quick Actions</h2>
-            <div className="space-y-4">
-              <button className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300">
-                Transfer Money
-              </button>
-              <button className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-300">
-                Pay Bills
-              </button>
-              <button className="w-full bg-purple-500 text-white py-2 rounded-lg hover:bg-purple-600 transition duration-300">
-                Mobile Top-up
-              </button>
-            </div>
-          </div>
-        </main>
+        </div>
       </div>
     </div>
   );
 };
 
-export default BankDashboard;
+export default BankDashBoard;

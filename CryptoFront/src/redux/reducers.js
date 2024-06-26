@@ -1,9 +1,8 @@
-import { SET_USER , LOGOUT_USER } from "./actions";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     user : null,
-    token : null
+    token : null,
 }
 
 const userSlice = createSlice({

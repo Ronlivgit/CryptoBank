@@ -63,7 +63,7 @@ const logUser = async (req,res) => {
               const wallet = await Wallet.findOne({ownerUserId : checkUser.userId})
               const token = generateToken(
                 {email : checkUser.email , role : checkUser.role ,
-                walletId : wallet.walletId, activeAddress : checkUser.activeAccount.address })
+                walletId : wallet.walletId, activeAddress : checkUser.activeAddress })
               return res.status(200).send({user : checkUser , token})
             }
             return res.status(401).json("User not found or invalid credentials");

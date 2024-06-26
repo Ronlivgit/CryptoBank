@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { baseUserUrl , postData } from '../../config/Api';
 import { useSelector , useDispatch } from 'react-redux';
 import { setUser } from '../../redux/reducers';
@@ -37,12 +37,13 @@ const AuthForm = () => {
         }
       })
       const finalRes = await res.json()
-      console.log("user : " , finalRes);
       dispatch(setUser({user : finalRes.user , token : finalRes.token}))
-      console.log("user : " , user);
-      
     }
   };
+
+  useEffect(()=>{
+    console.log("user useEffect in AUTH : " , user);
+  },[user])
 
   return (
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center px-4">

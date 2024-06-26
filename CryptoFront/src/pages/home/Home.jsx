@@ -1,51 +1,68 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Home.css";
 import { useSelector } from "react-redux";
 import Transactions from "../../components/Transactions";
+import BankDashboard from "../../components/DashBoard";
+import { baseOperatorUrl } from "../../config/Api";
+import StockTrack from "../../components/StockTracker";
+// import TransferForm from "../../components/TransferForm";
 
 export default function HomePage() {
 
   const user = useSelector((state)=> state.user)
-  useEffect(()=>{
-    console.log("useEffect user : " , user);
-  },[user])
+  const [txArray, setTxArray] = useState([]);
+  const [currentBalance,setCurrentBalance] = useState()
+  
+  useEffect(() => {
+    const asyncFetchTxs = async () => {
+        try {
+            const response = await fetch(`${baseOperatorUrl}/history`, {
+                headers: { Authorization: `Bearer ${user.token}` }
+            });
+            const data = await response.json();
+            setTxArray(data.history);
+            console.log("asyncFetchTxs Done");
+        } catch (error) {
+            console.error("Failed to fetch transaction history:", error);
+        }
+    };
+    const asyncFetchBalance = async () => {
+      try {
+        const response = await fetch(`${baseOperatorUrl}/`, {
+              headers: { Authorization: `Bearer ${user.token}` }
+            });
+            const data = await response.json();
+            console.log("currentBalance fetching is done" , data);
+            setCurrentBalance(parseInt(data.balance))
+          } catch (error) {
+            console.error("Failed to fetch transaction history:", error);
+          }
+        };
+    asyncFetchTxs();
+    asyncFetchBalance();
+    }, [user.token]);
 
+    
   return (
-    <div className="h-[96vh] -mt-[8px] flex">
+    // bg-slate-900
+    <div className="h-auto lg:h-[97.3vh] w-[100vw]  -mt-[2vh] flex flex-col flex-wrap overflow-y-auto
+    md:overflow-hidden bg-gradient-to-tr from-zinc-700 via-slate-700 to-stone-800/90">
       {/* Black Background : left Side */}
-      <div className="bg-slate-800/90 w-[70vw] h-full ">
-      {/* Balance + Graphs */}
-        <div className="bg-sky-300 h-[43%] mt-[0.5%]">
-          <h1>Welcome and etc, graphs, balance , ++</h1>
+        <div className="h-[43%] lg:w-[65%] bg-slate-800/50 text-center p-4">
+            <BankDashboard currentBalance={currentBalance} transactions={txArray}/>
         </div>
         {/* Transactions History*/}
-        <div className=" h-[56.3%] flex flex-col justify-evenly">
+        <div className="h-[57%] lg:w-[65%] w-full flex flex-col justify-center bg-slate-800/50 p-4 ">
+          <h1 className="text-2xl lg:text-4xl font-bold text-white/85 text-center relative lg:-top-[2vh]"> Recent Transactions </h1>
         {/* Create a Card or something to show the TXS based on the data, make every address a BNS */}
-          <div className="text-center w-auto">
-            <h1 className="text-4xl w-auto font-bold text-white/85 m-2">Your Transactions History </h1>
-          </div>
           {/* Transaction cards div */}
-          <div className="flex flex-col flex-wrap gap-3 h-[35vw]">
-            <Transactions />
+          <div className="flex flex-col flex-wrap w-[100%] md:w-[71.3%] md:ml-[15.5%] mt-4 h-[80%] bg-zinc-500/45">
+            <Transactions txArray={txArray} />
           </div>
         </div>
-      </div>
-      {/* Green BackGround : Right Side , unrelated to left side. */}
-      
-      <div className="bg-green-500 w-[30vw] h-full ">
-        {/* Credit Card, Quick Actions */}
-      </div>
-
+        <div className="w-[100%] md:w-[35%] h-[98%] mt-6 bg-slate-800/50 p-6">
+            <StockTrack />
+        </div>
     </div>
-  );
+  )
 }
-
-//BACKUP : 
-
-      // <div className="bg-blue-400 w-[27vw] h-full">
-      //   {/* Graphs and Friend List?. */}
-      // </div>
-
-      // <div className="bg-black w-[46vw] h-full ">
-      //   {/* Transactions History + Balance + Graphs  */}
-      // </div>
