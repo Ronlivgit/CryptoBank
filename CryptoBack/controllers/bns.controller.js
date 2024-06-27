@@ -65,8 +65,8 @@ const bnsByAddress = async (req,res) => {
 const checkIfExist = async(req,res) => {
     const {bnsName} = req.body
     try {
-        const isValid = await bnsContract.methods.userExists(bnsName).call({from : devAddress})
-        return res.status(200).send({message : `${bnsName} ${isValid ? "Is taken already" : "Is available"}`})
+        const bnsExist = await bnsContract.methods.userExists(bnsName).call({from : devAddress})
+        return res.status(200).send({message : `${bnsName} ${bnsExist ? "Is taken already" : "Is available"}` , isValid : !bnsExist})
     } catch (error) {
         console.error(error);
     }

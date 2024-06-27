@@ -10,4 +10,3 @@ export const setUser = (user) => ({
 export const logoutUser = () => ({
     type : LOGOUT_USER
 })
-

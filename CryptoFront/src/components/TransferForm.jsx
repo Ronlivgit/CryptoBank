@@ -16,7 +16,6 @@ const TransferForm = () => {
   return (
     <div className="flex flex-col h-full w-[100%] rounded-lg -mt-2">
       <div className='h-full p-4'>
-        {/* <h2 className="text-xl font-bold text-slate-100 mb-[3%] text-center ">Transfer Form</h2> */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full h-full">
           <div className="flex gap-4 ">
             <input
@@ -24,13 +23,13 @@ const TransferForm = () => {
               value={toAddress}
               onChange={(e) => setToAddress(e.target.value)}
               placeholder={isBns ? "Enter recipient BNS" : "Enter recipient address"}
-              className="flex-1 bg-slate-100 text-slate-900 rounded-xl p-2"
+              className="flex-1 bg-slate-100 text-slate-900 rounded-xl p-2 w-[40%] md:w-auto"
               required
             />
             <select
               value={isBns}
               onChange={() => setIsBns(!isBns)}
-              className="w-24 bg-slate-100 text-slate-900 rounded-xl p-2"
+              className="w-12 md:w-24 bg-slate-100 text-slate-900 rounded-xl p-2"
             >
               <option value={false}>Address</option>
               <option value={true}>BNS</option>

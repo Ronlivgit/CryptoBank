@@ -56,13 +56,12 @@ const getCardHistory = async (req,res) => {
 const useCreditCard = async (req,res) => {
     const {_amount , _to , description } = req.body
     const userToken = req.headers.authorization;
-    // console.log("req.header : " , req.header);
     try {
         const userWallet = await Wallet.findById(req.user.walletId)
         const _user = `0x${userWallet.accounts[0].data.address}`
-        const estimateGas = await cardContract.methods.changeBalance(_user , _amount).estimateGas({from : devAddress})
+        const estimateGas = await cardContract.methods.cardPayment(_user , _amount).estimateGas({from : devAddress})
         const gasPrice = await web3.eth.getGasPrice()
-        const data = cardContract.methods.changeBalance(_user , _amount).encodeABI()
+        const data = cardContract.methods.cardPayment(_user , _amount).encodeABI()
         const tx = {
             from : devAddress,
             to : cardCA,
