@@ -8,22 +8,22 @@ const { bnsAbi } = require("../smartContracts/ABIs");
 
 const web3 = new Web3(new Web3.providers.HttpProvider(config.webProvider));
 
-const devAddress = '0x5322f9A185d91480ED04eE09F10f0fE4aA6efC14'
+const devAddress = config.devAddress = config.devAddress
 const devAccount = web3.eth.accounts.privateKeyToAccount(config.devPk)
 
-const bnsContract = new web3.eth.Contract(bnsAbi,"0xc9E3c3324B8DA10Ce5C272964DD7B325d9930e6F")
-const bnsCA = "0xc9E3c3324B8DA10Ce5C272964DD7B325d9930e6F"
+const bnsContract = new web3.eth.Contract(bnsAbi,config.bnsContract)
+const bnsCA = config.bnsContract
+
 //! remove walletId field on both here and operator, reduces the gas required for the operation on blockchain.
 const registerBns = async (req,res) => {
     const { bnsName } = req.body
+    console.log("registerBns");
     try {
         const userWallet = await Wallet.findById(req.user.walletId)
-        const encryptedWalletId = encryptField(userWallet.walletId, config.encryptPass)
         const userAccount = userWallet.accounts[0].data
-        const estimateGas = await bnsContract.methods.addUser(userAccount.address ,
-             bnsName , encryptedWalletId).estimateGas({from : devAddress});
+        const estimateGas = await bnsContract.methods.addUser(userAccount.address,bnsName).estimateGas({from : devAddress});
         const gasPrice = await web3.eth.getGasPrice();
-        const data = bnsContract.methods.addUser(`0x${userAccount.address}` , bnsName , encryptedWalletId).encodeABI()
+        const data = bnsContract.methods.addUser(`0x${userAccount.address}` , bnsName).encodeABI()
         const tx = {
             from : devAddress,
             to : bnsCA,
@@ -35,7 +35,7 @@ const registerBns = async (req,res) => {
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         userWallet.bnsName = bnsName
         await userWallet.save()
-        return res.status(200).send({Message : `Attached BNS : ${bnsName} to : ${userAccount.address}`})
+        return res.status(200).send({Message : `Attached BNS : ${bnsName}`})
     } catch (error) {
         console.error(error);
     }
@@ -74,6 +74,7 @@ const checkIfExist = async(req,res) => {
 
 const removeBns = async (req,res) => {
     const {bnsName} = req.params
+    console.log("bnsName in removeBNs: " , bnsName)
     try {
         const estimateGas = await bnsContract.methods.removeUser(bnsName).estimateGas({from : devAddress})
         const gasPrice = await web3.eth.getGasPrice()

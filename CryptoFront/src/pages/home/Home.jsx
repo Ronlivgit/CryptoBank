@@ -11,7 +11,9 @@ export default function HomePage() {
   const user = useSelector((state)=> state.user)
   useFetchBalance(user)
   const [txArray, setTxArray] = useState([]);
+
   useEffect(() => {
+    console.log("UseEffect to fetch TXS")
     asyncFetchTxs(user).then((value)=>{setTxArray(value)})
   }, [user]);
 

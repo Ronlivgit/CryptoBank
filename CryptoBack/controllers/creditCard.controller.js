@@ -14,9 +14,9 @@ const { transferEligibility } = require("./operator.controller");
 const web3 = new Web3(new Web3.providers.HttpProvider(config.webProvider));
 
 const myAccount = web3.eth.accounts.privateKeyToAccount(config.devPk)
-const devAddress = '0x5322f9A185d91480ED04eE09F10f0fE4aA6efC14'
-const cardContract = new web3.eth.Contract(creditCardAbi,"0xfed70824BF57193993Dc801a81E5cCE26fC79AA1")
-const cardCA = "0xfed70824BF57193993Dc801a81E5cCE26fC79AA1"
+const devAddress = config.devAddress
+const cardContract = new web3.eth.Contract(creditCardAbi,config.cardContract)
+const cardCA = config.cardContract
 
 
 const getCardStatus = async (req,res) => {

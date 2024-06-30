@@ -10,15 +10,15 @@ const { balanceAbi } = require("../smartContracts/ABIs");
 const web3 = new Web3(new Web3.providers.HttpProvider(config.webProvider));
 
 const myAccount = web3.eth.accounts.privateKeyToAccount(config.devPk)
-const devAddress = '0x5322f9A185d91480ED04eE09F10f0fE4aA6efC14'
-const myContract = new web3.eth.Contract(balanceAbi,"0x541481976Dd87ECCd6B4914aCbaAd8298E7C13b2")
-const myCA = "0x541481976Dd87ECCd6B4914aCbaAd8298E7C13b2"
+const devAddress = config.devAddress
+const balanceContract = new web3.eth.Contract(balanceAbi,config.balanceContract)
+const balanceCA = config.balanceContract
 
 //! admin only!! can get every address's eligibility
 const globalCurrentBalance = async(req,res) => {
     const {walletAddress} = req.params
     try {
-        const result = await myContract.methods.currentBalance(walletAddress).call({from : devAddress})
+        const result = await balanceContract.methods.currentBalance(walletAddress).call({from : devAddress})
         const finalResult = serializeBigInt(result)
         return res.status(200).send({MSG : "Done : " , finalResult})
     } catch (error) {
@@ -30,7 +30,7 @@ const globalCurrentBalance = async(req,res) => {
 const getCurrentBalance = async (req,res) => {
     try {
         let userAccount = await Wallet.findById(req.user.walletId)
-        const result = await myContract.methods.currentBalance(`0x${userAccount.accounts[0].data.address}`).call({ from: myAccount.address });
+        const result = await balanceContract.methods.currentBalance(`0x${userAccount.accounts[0].data.address}`).call({ from: myAccount.address });
         return res.status(200).send({message : "Got Balance successfully , " , balance : serializeBigInt(result)})
     } catch (error) {
         console.error(error);
@@ -42,32 +42,39 @@ const transferBalance = async(req,res) => {
     const {toAddress , amount} = req.body
     try {
         let userAccount = await Wallet.findById(req.user.walletId)
-        let _from = `0x${userAccount.accounts[0].data.address}`
-        const estimateGas = await myContract.methods.transferBalance(_from,toAddress,amount).estimateGas({from : devAddress})
+        // let _from = `0x${userAccount.accounts[0].data.address}`
+        let _from = userAccount.accounts[0].data.address
+        const estimateGas = await balanceContract.methods.transferBalance(_from,toAddress,amount).estimateGas({from : devAddress})
         const gasPrice = await web3.eth.getGasPrice()
-        const data = myContract.methods.transferBalance(_from,toAddress,amount).encodeABI()
+        const nonce = await web3.eth.getTransactionCount(devAddress,'pending')
+        console.log("nonce : " , nonce);
+        const data = balanceContract.methods.transferBalance(_from,toAddress,amount).encodeABI()
         const tx = {
             from : devAddress,
-            to : myCA,
+            to : balanceCA,
             amount : amount,
             gas : estimateGas,
             gasPrice : gasPrice,
-            data : data
+            data : data,
+            nonce : nonce
         }
         const signedTx = await myAccount.signTransaction(tx)
+        console.log("signedTx : " , signedTx)
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        console.log("receipt : " , receipt)
         const tempPayload = serializeObject(receipt)
         const finalPayload = {
             from : _from,
             to : toAddress,
+            amount : amount,
             blockNumber : tempPayload.blockNumber,
             transactionHash : tempPayload.transactionHash,
         }
-        const newBalance = await myContract.methods.currentBalance(userAccount.accounts[0].data.address).call({ from: myAccount.address });
+        const newBalance = await balanceContract.methods.currentBalance(userAccount.accounts[0].data.address).call({ from: myAccount.address });
         return res.status(200).send({finalPayload})
     } catch (error) {
-        return res.status(401).send({Error : error.cause.message})
         console.error(error);
+        return res.status(401).send({Error : error})
     }
 }
 
@@ -75,13 +82,13 @@ const transferBalance = async(req,res) => {
 const changeBalance = async(req,res) => {
     const {_to , amount} = req.body
     try {
-        const oldBalance = await myContract.methods.currentBalance(_to).call({ from: myAccount.address });
-        const estimateGas = await myContract.methods.changeBalance(_to , amount).estimateGas({from : devAddress})
+        const oldBalance = await balanceContract.methods.currentBalance(_to).call({ from: myAccount.address });
+        const estimateGas = await balanceContract.methods.changeBalance(_to , amount).estimateGas({from : devAddress})
         const gasPrice = await web3.eth.getGasPrice()
-        const data = myContract.methods.changeBalance(_to , amount).encodeABI()
+        const data = balanceContract.methods.changeBalance(_to , amount).encodeABI()
         const tx = {
             from : devAddress,
-            to : myCA,
+            to : balanceCA,
             amount : amount,
             gas : estimateGas,
             gasPrice : gasPrice,
@@ -89,7 +96,7 @@ const changeBalance = async(req,res) => {
         }
         const signedTx = await myAccount.signTransaction(tx)
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-        const newBalance = await myContract.methods.currentBalance(_to).call({ from: myAccount.address });
+        const newBalance = await balanceContract.methods.currentBalance(_to).call({ from: myAccount.address });
         return res.status(200).send({Msg :`${_to} Previous Balance : ${oldBalance} , New Balance : ${newBalance}`})
     } catch (error) {
         console.error(error);
@@ -99,13 +106,13 @@ const changeBalance = async(req,res) => {
 const balanceHistory = async(req,res) => {
     try {
         let userAccount = await Wallet.findById(req.user.walletId)
-        const result = await myContract.methods.userHistory(userAccount.accounts[0].data.address).call({ from: myAccount.address });
+        const result = await balanceContract.methods.userHistory(userAccount.accounts[0].data.address).call({ from: myAccount.address });
         const userHistory = result.map((item)=>{
             return serializeObject(item)
         })
         return res.status(200).send({message : "Got Eligibility successfully , " , history : userHistory})
     } catch (error) {
-        console.error(error);
+      return res.status(401).send({message : "Couldn't Fetch Transactions History , contact Support for help."})
     }
 }
 

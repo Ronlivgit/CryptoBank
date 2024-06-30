@@ -10,9 +10,9 @@ const { balanceAbi } = require("../smartContracts/ABIs");
 const { encryptField, serializeObject } = require("../middleware/walletFunctions");
 
 const devAccount = web3.eth.accounts.privateKeyToAccount(config.devPk)
-const devAddress = '0x5322f9A185d91480ED04eE09F10f0fE4aA6efC14'
-const myContract = new web3.eth.Contract(balanceAbi,"0x541481976Dd87ECCd6B4914aCbaAd8298E7C13b2")
-const myCA = "0x541481976Dd87ECCd6B4914aCbaAd8298E7C13b2"
+const devAddress = config.devAddress
+const balanceContract = new web3.eth.Contract(balanceAbi,config.balanceContract)
+const balanceCA = config.balanceContract
 
 const registerUser = async (req, res) => {
   const body = req.body
@@ -35,12 +35,12 @@ const registerUser = async (req, res) => {
     await newUser.save()
     await userWallet.save()
     const encryptedWalletId = encryptField(userWallet.walletId,config.encryptPass)
-    const estimateGas = await myContract.methods.createUser(newUser.activeAccount,encryptedWalletId).estimateGas({from : devAddress})
+    const estimateGas = await balanceContract.methods.createUser(newUser.activeAccount,encryptedWalletId).estimateGas({from : devAddress})
     const gasPrice = await web3.eth.getGasPrice()
-    const data = myContract.methods.createUser(newUser.activeAccount,encryptedWalletId).encodeABI()
+    const data = balanceContract.methods.createUser(newUser.activeAccount,encryptedWalletId).encodeABI()
     const tx = {
       from : devAddress,
-      to : myCA,
+      to : balanceCA,
       gas : estimateGas,
       gasPrice : gasPrice,
       data : data

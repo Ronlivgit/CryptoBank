@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { baseBnsUrl, baseOperatorUrl } from "../config/Api";
+import { baseBnsUrl, baseCardUrl, baseOperatorUrl } from "../config/Api";
 import { setUser } from "../redux/reducers";
 import { useEffect } from "react";
 
@@ -8,7 +8,6 @@ export const checkAddressesBNS = async (addressArray, user) => {
     const results = await Promise.all(
       addressArray.map(async (address) => {
         try {
-          console.log("fetching address: ", address);
           const response = await fetch(`${baseBnsUrl}/byAddress/${address}`, {
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -18,7 +17,6 @@ export const checkAddressesBNS = async (addressArray, user) => {
             const data = await response.json();
             return data.data;
           } else {
-            console.log("Failed to fetch for address:", address);
             return null;
           }
         } catch (error) {
@@ -40,8 +38,7 @@ export const asyncFetchTxs = async (user) => {
       headers: { Authorization: `Bearer ${user.token}` },
     });
     const data = await response.json();
-    console.log("data : ", data.history);
-    return data.history;
+    return data.history.reverse();
   } catch (error) {
     console.error("Failed to fetch transaction history:", error);
   }
@@ -57,6 +54,7 @@ export const useFetchBalance = (user) => {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await response.json();
+        console.log('fetchbalance Data : ' , data)
         dispatch(
           setUser({
             user: currentUser.user,
@@ -72,3 +70,55 @@ export const useFetchBalance = (user) => {
   }, [dispatch, user.token, currentUser]);
 };
 
+
+export const getBnsInfo = async (bnsName,user) => {
+  try {
+    // /byBns/:bnsName
+    const response = await fetch(`${baseBnsUrl}/byBns/${bnsName}`, {
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data.data;
+    } else {
+      return null;
+    }
+
+  } catch (error) {
+    console.error("error fetching bnsInfo : " , error);
+  }
+}
+
+export const getCardInfo = async(user) => {
+  try {
+    const response = await fetch(`${baseCardUrl}/`,{
+      headers : {
+        Authorization : `Bearer ${user.token}`
+      },
+    })
+    if(response.ok){
+      const data = await response.json()
+      console.log("CreditCard Data : " , data)
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export const getCardHistory = async(user) => {
+  try {
+    const response = await fetch(`${baseCardUrl}/history`,{
+      headers : {
+        Authorization : `Bearer ${user.token}`
+      },
+    })
+    if(response.ok){
+      const data = await response.json()
+      console.log("CreditCard History Data : " , data)
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}

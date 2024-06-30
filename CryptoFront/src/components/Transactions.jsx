@@ -9,11 +9,10 @@ const Transactions = (props) => {
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
+    console.log("UseEffect in Txs to fetch BNS ");
     const fetchBnsArray = async () => {
       try {
-        // Use a Set to store unique addresses
         const uniqueAddresses = new Set();
-        // Extract unique 'to' and 'from' addresses from props.txArray
         props.txArray.forEach((item) => {
           if (item.to) {
             uniqueAddresses.add(item.to);
@@ -24,7 +23,6 @@ const Transactions = (props) => {
         });
         // Convert the Set to an array
         const addressArray = Array.from(uniqueAddresses);
-        console.log("Unique Addresses:", addressArray);
         if (addressArray.length > 0) {
           const checkedBns = await checkAddressesBNS(addressArray, user);
           setBnsArray(checkedBns);
@@ -37,7 +35,7 @@ const Transactions = (props) => {
     if (props.txArray.length > 0) {
       fetchBnsArray();
     }
-  }, [user]);
+  }, [user,props?.txArray]);
 
   const getBnsName = (address) => {
     const bnsEntry = bnsArray.find((bns) => bns[0] === address);
@@ -68,7 +66,7 @@ const Transactions = (props) => {
             const to = item.to;
 
             const isIncome =
-              item.from !== user.user.activeAddress && item.amount > 0;
+              item.from !== user.user.activeAddress && item.amount >= 0;
 
             switch (item.operationType) {
               case "changeBalance":
@@ -123,7 +121,7 @@ const Transactions = (props) => {
                 </td>
                 <td className="border border-black/50 text-xl">
                   {isIncome ? (
-                    <span className="text-green-400">+{item.amount}$</span>
+                    <span className="text-green-400">{item.amount}$</span>
                   ) : (
                     <span className="text-red-500">{item.amount}$</span>
                   )}

@@ -19,10 +19,15 @@ const userSlice = createSlice({
             state.user = null
             state.token = null
             state.balance = null
-        }
+        },
+        setBnsName: (state, action) => {
+            if (state.user) {
+                state.user.bnsName = action.payload;
+            }
+        },
     },
 })
 
-export const {setUser , logoutUser , setBalance} = userSlice.actions;
+export const {setUser , logoutUser , setBnsName} = userSlice.actions;
 
 export default userSlice.reducer;

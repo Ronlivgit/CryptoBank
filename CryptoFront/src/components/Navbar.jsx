@@ -16,11 +16,11 @@ function Navbar() {
   return (
     <>
       {user && user.user ?
-      <div className="navbar bg-gradient-to-l from-teal-500 via-teal-200 to-indigo-500 sticky z-10 display: flex flex-wrap justify-evenly h-6 rounded-xl -mt-2">
+      <div className="navbar bg-gradient-to-l from-teal-500 via-teal-300 to-teal-500 sticky z-10 display: flex flex-wrap justify-evenly h-6 rounded-xl -mt-2">
       {/* <div className="navbar bg-teal-400 sticky z-10 display: flex flex-wrap justify-evenly h-6 rounded-xl -mt-2"> */}
         <nav className="flex flex-row w-full gap-2 justify-evenly text-slate-950">
         <Link to={'/'} className="btn btn-ghost text-xl">Home</Link>
-        <Link to={'/card'} className="btn btn-ghost text-xl">Cards</Link>
+        <Link to={'/Dashboard'} className="btn btn-ghost text-xl">Dashboard</Link>
         <Link to={'/about'} className="btn btn-ghost text-xl">About Us</Link>
         <div className="mr-4">
             <div className="dropdown dropdown-end">

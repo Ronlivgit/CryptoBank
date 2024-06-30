@@ -14,7 +14,7 @@ function App() {
 
   useEffect(()=>{
     if(user&&user.user){
-      console.log("if");
+      console.log("if" , user);
     }
     else{
       console.log("else");
@@ -30,7 +30,7 @@ function App() {
             <>
             {/* HomePage of logged in will be Dashboard. */}
               <Route path='/' element={<HomePage/>}/>
-              <Route path='/card' element={<CardPage/>}/>
+              <Route path='/Dashboard' element={<CardPage/>}/>
               <Route path='/about' element={<AboutUs/>}/>
             </>
             :

@@ -10,7 +10,7 @@ const BankDashBoard = ({ transactions, currentBalance }) => {
   const lineChartRef = useRef(null);
   const pieChartRef = useRef(null);
 
-  const { labels, balances, operations } = transactions.reduce((acc, transaction) => {
+  const { labels, balances, operations } = transactions.reverse().reduce((acc, transaction) => {
     const date = new Date(parseInt(transaction.timestamp) * 1000);
     const amount = parseInt(transaction.amount);
     acc.labels.push(date);
@@ -23,7 +23,6 @@ const BankDashBoard = ({ transactions, currentBalance }) => {
     } else if (transaction.operationType === "transferBalance") {
       amount > 0 ? acc.operations.received += amount : acc.operations.sent -= amount;
     }
-
     return acc;
   }, { 
     labels: [], 

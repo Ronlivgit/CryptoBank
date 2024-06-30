@@ -1,16 +1,38 @@
 import { useState } from 'react';
+import { getBnsInfo } from '../utils/generalFunctions';
+import { useSelector } from 'react-redux';
+import { baseOperatorUrl } from '../config/Api';
 
 const TransferForm = () => {
   // State to manage form inputs
   const [amount, setAmount] = useState('');
   const [toAddress, setToAddress] = useState('');
   const [isBns, setIsBns] = useState(false);
+  const user = useSelector((state)=> state.user)
 
   // Function to handle form submission
-  // TODO : Add functionality of transfer to Both BNS and Address.
-  const handleSubmit = (e) => {
+  // TODO : Add Modal that will show the loading proccess and returns the information about the post.
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("HandleSubmit activated")
     console.log('Submitted:', { amount, toAddress , isBns });
+    try {
+      const finalAddress = isBns ? await getBnsInfo(toAddress,user) : toAddress
+      console.log("finalAddress " , finalAddress)
+        const response = await fetch(`${baseOperatorUrl}/transfer`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${user.token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({toAddress : finalAddress , amount : amount}),
+        });
+        const data = await response.json();
+        console.log("bns : " , data)
+    } 
+    catch (error) {
+      console.error(error);
+    }
   };
 
   return (

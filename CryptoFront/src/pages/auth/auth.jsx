@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { baseUserUrl , postData } from '../../config/Api';
+import { baseUserUrl } from '../../config/Api';
 import { useSelector , useDispatch } from 'react-redux';
 import { setUser } from '../../redux/reducers';
+import { checkAddressesBNS } from '../../utils/generalFunctions';
 
 const AuthForm = () => {
-  const [gotUser,setGotUser] = useState(false)
+  const [gotUser,setGotUser] = useState(true)
   const [newUser,setNewUser] = useState({})
   
   const user = useSelector((state)=> state.user)
@@ -15,8 +16,18 @@ const AuthForm = () => {
       setNewUser(newUser)
   }
 
-  const logDemoAccount = () => {
+  const logDemoAccount = async () => {
     //Login Post but make it default b@b.com , 123123
+    const res = await fetch(`${baseUserUrl}/login`,{
+      method : "POST",
+      body : JSON.stringify({email : "b@b.com" , password : "123123"}),
+      headers : {
+        "Content-Type" : "application/json"
+      }
+    })
+    const finalRes = await res.json()
+    console.log("res of logDemo account : " , finalRes)
+    dispatch(setUser({user : finalRes.user , token : finalRes.token}))
   }
 
   const handleSubmit = async(e) => {
@@ -28,7 +39,7 @@ const AuthForm = () => {
     }
     else{
       // Login POST
-      console.log("newUser : " , newUser);
+      console.log(newUser)
       const res = await fetch(`${baseUserUrl}/login`,{
         method : "POST",
         body : JSON.stringify(newUser),
@@ -37,7 +48,17 @@ const AuthForm = () => {
         }
       })
       const finalRes = await res.json()
-      dispatch(setUser({user : finalRes.user , token : finalRes.token}))
+      console.log("finalRes : " , finalRes)
+      const userBns = await checkAddressesBNS([`0x${finalRes.user.activeAddress}`] , finalRes)
+      console.log("userBns : " , userBns)
+      const userPayload = {
+        activeAddress : finalRes.user.activeAddress,
+        firstName : finalRes.user.firstName ,
+        lastName :  finalRes.user.lastName ,
+        walletId :  finalRes.user.walletId ,
+        bnsName :  userBns.length > 0 ? userBns[0][1] : null
+      }
+      dispatch(setUser({user : userPayload , token : finalRes.token}))
     }
   };
 
