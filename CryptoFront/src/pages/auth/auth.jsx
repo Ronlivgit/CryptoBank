@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { baseUserUrl } from '../../config/Api';
-import { useSelector , useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/reducers';
 import { checkAddressesBNS } from '../../utils/generalFunctions';
 
@@ -8,26 +8,36 @@ const AuthForm = () => {
   const [gotUser,setGotUser] = useState(true)
   const [newUser,setNewUser] = useState({})
   
-  const user = useSelector((state)=> state.user)
   const dispatch = useDispatch()
 
   const changeHandler = (e) => {
       newUser[e.target.name] = e.target.value
       setNewUser(newUser)
+      console.log(newUser)
   }
 
   const logDemoAccount = async () => {
-    //Login Post but make it default b@b.com , 123123
+    userLogin({email : "b@b.com" , password : '123123'})
+  }
+
+  const userLogin = async(userInfo) => {
     const res = await fetch(`${baseUserUrl}/login`,{
       method : "POST",
-      body : JSON.stringify({email : "b@b.com" , password : "123123"}),
+      body : JSON.stringify(userInfo),
       headers : {
         "Content-Type" : "application/json"
       }
     })
     const finalRes = await res.json()
-    console.log("res of logDemo account : " , finalRes)
-    dispatch(setUser({user : finalRes.user , token : finalRes.token}))
+    const userBns = await checkAddressesBNS([`0x${finalRes.user.activeAddress}`] , finalRes)
+    const userPayload = {
+      activeAddress : finalRes.user.activeAddress,
+      firstName : finalRes.user.firstName ,
+      lastName :  finalRes.user.lastName ,
+      walletId :  finalRes.user.walletId ,
+      bnsName :  userBns.length > 0 ? userBns[0][1] : null
+    }
+    dispatch(setUser({user : userPayload , token : finalRes.token}))
   }
 
   const handleSubmit = async(e) => {
@@ -39,32 +49,10 @@ const AuthForm = () => {
     }
     else{
       // Login POST
-      console.log(newUser)
-      const res = await fetch(`${baseUserUrl}/login`,{
-        method : "POST",
-        body : JSON.stringify(newUser),
-        headers : {
-          "Content-Type" : "application/json"
-        }
-      })
-      const finalRes = await res.json()
-      console.log("finalRes : " , finalRes)
-      const userBns = await checkAddressesBNS([`0x${finalRes.user.activeAddress}`] , finalRes)
-      console.log("userBns : " , userBns)
-      const userPayload = {
-        activeAddress : finalRes.user.activeAddress,
-        firstName : finalRes.user.firstName ,
-        lastName :  finalRes.user.lastName ,
-        walletId :  finalRes.user.walletId ,
-        bnsName :  userBns.length > 0 ? userBns[0][1] : null
-      }
-      dispatch(setUser({user : userPayload , token : finalRes.token}))
+      userLogin(newUser)
     }
   };
 
-  useEffect(()=>{
-    console.log("user useEffect in AUTH : " , user);
-  },[user])
 
   return (
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center px-4">

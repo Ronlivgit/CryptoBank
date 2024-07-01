@@ -29,12 +29,12 @@ function Navbar() {
                         <img alt="Tailwind CSS Navbar component" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
                     </div>
                 </div>
-                <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-lime-400 rounded-box w-42 ">
+                <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-teal-400 rounded-box w-42 ">
                 {user && user.user ? 
                 <>
                     <li><a>Dashboard</a></li>
                     <li><a onClick={logUserOut}>Logout</a></li>
-                </> 
+                </>
                 :
                 <>
                     <li><a>Login</a></li>

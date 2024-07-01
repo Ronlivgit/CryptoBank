@@ -35,7 +35,7 @@ const getCardStatus = async (req,res) => {
     }
 }
 
-const getCardHistory = async (req,res) => {
+const getUsageHistory = async (req,res) => {
     try {
         const userWallet = await Wallet.findById(req.user.walletId)
         const result = await cardContract.methods.getUsageHistory(`0x${userWallet.accounts[0].data.address}`).call({from:devAddress})
@@ -43,9 +43,24 @@ const getCardHistory = async (req,res) => {
             const tempItem = serializeObject(item)
             const payload = {
                 amount : tempItem.amount,
-                timeStamp : tempItem.timestamp
+                timeStamp : tempItem.timestamp,
+                description : tempItem.description 
             }
             return payload
+        })
+        return res.status(200).send({Message : "Done successfully : " , result : fixedResult})
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+const getSubscriptionHistory = async (req,res) => {
+    try {
+        const userWallet = await Wallet.findById(req.user.walletId)
+        const result = await cardContract.methods.getSubscriptions(`0x${userWallet.accounts[0].data.address}`).call({from:devAddress})
+        const fixedResult = result.map((item)=>{
+            const tempItem = serializeObject(item)
+            return tempItem
         })
         return res.status(200).send({Message : "Done successfully : " , result : fixedResult})
     } catch (error) {
@@ -112,4 +127,4 @@ const updateLimit = async (req,res) => {
     }
 }
 
-module.exports = {getCardStatus , getCardHistory , useCreditCard , createCard , updateLimit}
+module.exports = {getCardStatus , getUsageHistory , useCreditCard , createCard , updateLimit , getSubscriptionHistory}

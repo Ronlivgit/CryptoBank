@@ -54,7 +54,6 @@ export const useFetchBalance = (user) => {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await response.json();
-        console.log('fetchbalance Data : ' , data)
         dispatch(
           setUser({
             user: currentUser.user,
@@ -100,7 +99,7 @@ export const getCardInfo = async(user) => {
     })
     if(response.ok){
       const data = await response.json()
-      console.log("CreditCard Data : " , data)
+      return data.result
     }
   } catch (error) {
     console.error(error);
@@ -116,7 +115,23 @@ export const getCardHistory = async(user) => {
     })
     if(response.ok){
       const data = await response.json()
-      console.log("CreditCard History Data : " , data)
+      return data.result
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export const getCardSubs = async(user) => {
+  try {
+    const response = await fetch(`${baseCardUrl}/subscriptions`,{
+      headers : {
+        Authorization : `Bearer ${user.token}`
+      },
+    })
+    if(response.ok){
+      const data = await response.json()
+      return data.result
     }
   } catch (error) {
     console.error(error);

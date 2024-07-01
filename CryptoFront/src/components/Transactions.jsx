@@ -4,16 +4,16 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { checkAddressesBNS } from "../utils/generalFunctions";
 
-const Transactions = (props) => {
+const Transactions = ({txArray}) => {
   const [bnsArray, setBnsArray] = useState([]);
   const user = useSelector((state) => state.user);
 
+
   useEffect(() => {
-    console.log("UseEffect in Txs to fetch BNS ");
     const fetchBnsArray = async () => {
       try {
         const uniqueAddresses = new Set();
-        props.txArray.forEach((item) => {
+        txArray.forEach((item) => {
           if (item.to) {
             uniqueAddresses.add(item.to);
           }
@@ -32,10 +32,10 @@ const Transactions = (props) => {
       }
     };
 
-    if (props.txArray.length > 0) {
+    if (txArray.length > 0) {
       fetchBnsArray();
     }
-  }, [user,props?.txArray]);
+  }, [user,txArray]);
 
   const getBnsName = (address) => {
     const bnsEntry = bnsArray.find((bns) => bns[0] === address);
@@ -55,7 +55,7 @@ const Transactions = (props) => {
           </tr>
         </thead>
         <tbody className="">
-          {props.txArray?.map((item) => {
+          {txArray.map((item) => {
             const date = new Date(item.timestamp * 1000).toLocaleDateString();
             const fromBns = getBnsName(item.from);
             const toBns = getBnsName(item.to);
