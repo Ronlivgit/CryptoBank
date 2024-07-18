@@ -17,7 +17,6 @@ const bnsCA = config.bnsContract
 //! remove walletId field on both here and operator, reduces the gas required for the operation on blockchain.
 const registerBns = async (req,res) => {
     const { bnsName } = req.body
-    console.log("registerBns");
     try {
         const userWallet = await Wallet.findById(req.user.walletId)
         const userAccount = userWallet.accounts[0].data
@@ -74,7 +73,6 @@ const checkIfExist = async(req,res) => {
 
 const removeBns = async (req,res) => {
     const {bnsName} = req.params
-    console.log("bnsName in removeBNs: " , bnsName)
     try {
         const estimateGas = await bnsContract.methods.removeUser(bnsName).estimateGas({from : devAddress})
         const gasPrice = await web3.eth.getGasPrice()

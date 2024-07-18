@@ -6,7 +6,7 @@ import 'chartjs-adapter-date-fns';
 
 ChartJS.register(TimeScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
-const BankDashBoard = ({ transactions, currentBalance }) => {
+const HomeCharts = ({ transactions, currentBalance }) => {
   const lineChartRef = useRef(null);
   const pieChartRef = useRef(null);
 
@@ -125,4 +125,4 @@ const BankDashBoard = ({ transactions, currentBalance }) => {
   );
 };
 
-export default BankDashBoard;
+export default HomeCharts;

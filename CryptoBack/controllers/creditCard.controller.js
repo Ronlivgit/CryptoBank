@@ -39,7 +39,7 @@ const getUsageHistory = async (req,res) => {
     try {
         const userWallet = await Wallet.findById(req.user.walletId)
         const result = await cardContract.methods.getUsageHistory(`0x${userWallet.accounts[0].data.address}`).call({from:devAddress})
-        const fixedResult = result.map((item)=>{
+        const fixedResult = result?.map((item)=>{
             const tempItem = serializeObject(item)
             const payload = {
                 amount : tempItem.amount,

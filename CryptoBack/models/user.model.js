@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const roleOptions = ["user","moderator","owner"]
 
 const userSchema = new mongoose.Schema({
-    userId : {type : String,} ,
+    userId : {type : String} ,
     firstName : {type : String, require : true} ,
     lastName : {type : String, require : true} ,
     bnsName : {type : String},

@@ -1,35 +1,37 @@
 /* eslint-disable react/prop-types */
 
 const CardDetails = ({isHistory,dataArray}) => {
-    console.log("dataArray in card Details : " , dataArray)
-    console.log("isHistory in card Details : " , isHistory)
     //! Subscription fields : amount , duration , name , nextPayment , startTimestamp
     //! History fields : amount , timestamp , description
-
   return (
-        <div className='w-full h-full flex flex-row flex-wrap gap-4 justify-evenly '>
-            {isHistory ? 
-            <h1 className='text-2xl'>Card History</h1> 
-            :
-            <h1 className='text-2xl'>Card Subscriptions</h1>}
-            {isHistory && dataArray.map((item, index) => (
-            <div className='w-[90%] h-[10%] bg-slate-100 rounded-3xl p-2 flex flex-col flex-wrap justify-evenly 
-            text-center text-black '
-            key={index}>
-                <h1>{item.description}</h1>
-                <h2 className=''>{new Date(parseInt(item.timeStamp) * 1000).toLocaleDateString()}</h2>
-                <h3 className='text-red-500'>{item.amount}</h3>
-            </div>
-            ))}
-
-            {!isHistory && dataArray.map((item, index) => (
-            <div className='w-full h-full rounded-3xl bg-blue-500' key={index}>
-                <h1>{item.subscriptionName}</h1>
-                <h2>{item.nextBillingDate}</h2>
-                <h3>{item.amount}</h3>
-            </div>
-            ))}
+    <div className="space-y-2 h-[80%] overflow-y-auto">
+      {dataArray.map((item, index) => (
+        <div key={index} className="bg-gray-800 bg-opacity-50 rounded-lg p-3 text-sm">
+          {isHistory ? (
+            <>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-gray-400">{new Date(parseInt(item.timeStamp)*1000).toLocaleDateString()}</span>
+                <span className="font-bold text-red-400">
+                  {parseFloat(item.amount).toFixed(2)} $
+                </span>
+              </div>
+              <div className="text-white truncate">{item.description}</div>
+            </>
+          ) : (
+            <>
+              <div className="flex justify-between text-gray-400 text-xs mb-1">
+                <span>Started at : {new Date(parseInt(item.startTimestamp)*1000).toLocaleDateString()}</span>
+                <span>Next payment : {new Date(parseInt(item.nextPayment)*1000).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-white font-medium truncate">{item.name}</span>
+                <span className="text-red-400 font-bold">{parseFloat(item.amount).toFixed(2)} $</span>
+              </div>
+            </>
+          )}
         </div>
+      ))}
+    </div>
   )
 }
 

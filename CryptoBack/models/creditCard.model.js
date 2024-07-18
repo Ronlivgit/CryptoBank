@@ -1,13 +1,13 @@
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
 
 
-const cardSchema = new mongoose.Schema({
-    cardHash : {type : String , required : true},
-    walletId : {type : String , default : ""},
-    cardPayload : {type : Object , required : true}
-})
+// const cardSchema = new mongoose.Schema({
+//     cardHash : {type : String , required : true},
+//     walletId : {type : String , default : ""},
+//     cardPayload : {type : Object , required : true}
+// })
 
 
-const CredCard = mongoose.model("CreditCards" , cardSchema)
+// const CredCard = mongoose.model("CreditCards" , cardSchema)
 
-module.exports = { CredCard }
+// module.exports = { CredCard }

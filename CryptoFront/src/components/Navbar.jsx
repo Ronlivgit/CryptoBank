@@ -21,7 +21,7 @@ function Navbar() {
         <nav className="flex flex-row w-full gap-2 justify-evenly text-slate-950">
         <Link to={'/'} className="btn btn-ghost text-xl">Home</Link>
         <Link to={'/Dashboard'} className="btn btn-ghost text-xl">Dashboard</Link>
-        <Link to={'/about'} className="btn btn-ghost text-xl">About Us</Link>
+        <Link to={'/Invest'} className="btn btn-ghost text-xl">Invest</Link>
         <div className="mr-4">
             <div className="dropdown dropdown-end">
                 <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">

@@ -42,7 +42,6 @@ const transferBalance = async(req,res) => {
     const {toAddress , amount} = req.body
     try {
         let userAccount = await Wallet.findById(req.user.walletId)
-        // let _from = `0x${userAccount.accounts[0].data.address}`
         let _from = userAccount.accounts[0].data.address
         const estimateGas = await balanceContract.methods.transferBalance(_from,toAddress,amount).estimateGas({from : devAddress})
         const gasPrice = await web3.eth.getGasPrice()

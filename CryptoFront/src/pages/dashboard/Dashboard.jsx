@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import Transactions from "../../components/Transactions";
 import TransferForm from "../../components/TransferForm";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import RegisterBNS from "../../components/RegisterBNS";
 import BnsCard from "../../components/BnsCard";
 import CardDetails from "../../components/CardDetails";
@@ -11,17 +10,18 @@ import { useLoaderData } from "react-router-dom";
 const UserDashboard = () => {
   // Register BNS , Create Card ,
   const [txPagination, setTxPagination] = useState(1);
-  const [currentTxArray, setCurrentTxArray] = useState([]);
-  const { txArray, cardStatus, cardHistory, cardSubs, user, error } = useLoaderData();
+  const loaderData = useLoaderData()
+  const [isHistory,setIsHistory] = useState(true)
+  const { txArray, cardStatus, cardHistory, cardSubs , user, error } = loaderData || {}
   const balanceUsedInPercentage = (parseFloat(cardStatus?.usedBalance / cardStatus?.creditLimit) * 100);
+  
+  if(error){
+    console.error("Error on loaderData : " , error)
+  }
 
-  useEffect(() => {
-    if (txArray) {
-      setCurrentTxArray(
-        txArray?.slice((txPagination - 1) * 10, (txPagination - 1) * 10 + 10)
-      );
-    }
-  }, [txArray, txPagination]);
+  const currentTxArray = useMemo(()=>{
+    return txArray?.slice((txPagination - 1) * 10, (txPagination - 1) * 10 + 10)
+  },[txArray,txPagination])
 
   const paginationForward = () => {
     if ((txPagination - 1) * 10 + 10 < txArray?.length) {
@@ -149,19 +149,30 @@ const UserDashboard = () => {
                   </button>
                 </div>
                 <div className="md:h-[49vh] mt-4">
-                  {currentTxArray?.length >= 1 ? (
+                  {currentTxArray?.length > 0 ? (
                     <Transactions txArray={currentTxArray} />
                   ) : (
-                    ""
+                    "You have no Transactions, please try again after u had some transactions."
                   )}
                 </div>
               </div>
 
               <div className="bg-white bg-opacity-15 backdrop-blur-lg rounded-xl p-6 text-white">
-               <div className=''>
-                  <CardDetails isHistory={true} dataArray={cardHistory} />
+                <h1 className="text-center text-2xl mb-4">My {isHistory ? "History" : "Subscriptions"}</h1>
+                  {isHistory ? (
+                  <div id="historyDetails" className=''>
+                      <CardDetails isHistory={isHistory} dataArray={cardHistory} />
+                  </div>
+                  ) 
+                  : (
+                  <div id="subscriptionDetails" className=''>
+                      <CardDetails isHistory={isHistory} dataArray={cardSubs} />
+                  </div>
+                  )}
+                  <button className="w-[50%] bg-teal-400 rounded-3xl h-auto md:h-10 ml-[25%] mt-4" onClick={()=>setIsHistory(!isHistory)}>
+                    Watch {isHistory ? "Subscriptions" : "History" }
+                  </button>
                 </div>
-              </div>
             </div>
           </div>
         </div>
